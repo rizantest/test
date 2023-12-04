@@ -80,7 +80,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Danny Torrence left the following review for your property:"
+                    "text": "The build is success"
                   }
                 },
                 {
