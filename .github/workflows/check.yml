@@ -1,0 +1,91 @@
+name: Build and Notify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: echo "hi"
+
+  notify-start:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification on pipeline start
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build has been triggered."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-success:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Send notification on pipeline success
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build is successful."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-failure:
+    needs: build
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Send notification on pipeline failure
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build has failed."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-duration:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check duration and send notification if more than 5 minutes
+        run: |
+          start_time=$(date -u -d "$(jq -r '.jobs.build.steps[-1].started_at' $GITHUB_EVENT_PATH)" '+%s')
+          end_time=$(date -u -d "$(jq -r '.jobs.build.steps[-1].completed_at' $GITHUB_EVENT_PATH)" '+%s')
+          duration=$((end_time - start_time))
+          if [ $duration -gt 300 ]; then
+            echo "::set-output name=send_notification::true"
+          fi
+        id: check_duration
+
+      - name: Send notification on long-running pipeline
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build took more than 5 minutes to complete."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        if: steps.check_duration.outputs.send_notification == 'true'
