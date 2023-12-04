@@ -33,7 +33,6 @@ jobs:
          end_time=$(date -u '+%s')
   
          echo "build started"
-         sleep 120
   
          end_time=$(date -u '+%s')
          duration=$((end_time - start_time))
