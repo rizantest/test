@@ -26,13 +26,15 @@ jobs:
     #         Job: ${{ job.name }}
     #         Status: ${{ job.status }}
   
-      - name: Publish to slack channel via bot token
+
+      - name: Send GitHub trigger payload to Slack Workflow Builder
         id: slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: 'SLACK_CHANNEL_ID' # ID of Slack Channel you want to post to
-          slack-message: 'posting from a github action!' # The message you want to post
+          payload: |
+            {
+              "key": "value",
+              "foo": "bar"
+            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-              
