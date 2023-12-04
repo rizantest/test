@@ -1,0 +1,28 @@
+name: Build and Notify
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: # Your build commands here
+      - name: Notify Slack
+        uses: actions/notify-slack@v3
+        with:
+          slack_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          channel: '#your-slack-channel'
+          icon_url: 'https://github.com/favicon.ico'
+          message: |
+            Workflow: ${{ github.workflow }}
+            Branch: ${{ github.ref }}
+            Job: ${{ job.name }}
+            Status: ${{ job.status }}
+
