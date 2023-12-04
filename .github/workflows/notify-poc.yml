@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: # Your build commands here
+        run: echo "hi"
       - name: Notify Slack
         uses: actions/notify-slack@v3
         with:
