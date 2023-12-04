@@ -25,6 +25,7 @@ jobs:
     
   notify-duration:
    runs-on: ubuntu-latest
+   timeout-minutes: 1
    needs: notify-start
    steps:
      - name: Check duration and send notification if more than 5 minutes
@@ -33,6 +34,7 @@ jobs:
          end_time=$(date -u '+%s')
   
          echo "build started"
+         sleep 130
   
          end_time=$(date -u '+%s')
          duration=$((end_time - start_time))
