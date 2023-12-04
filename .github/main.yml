@@ -1,0 +1,22 @@
+name: Send Slack Message on Pipeline Trigger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  send-slack-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Send Slack Message
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"GitHub Actions Pipeline Triggered!"}' \
+          $SLACK_WEBHOOK_URL
