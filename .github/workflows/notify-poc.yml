@@ -13,22 +13,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build
         run: echo "hi"
-    #   - name: Notify Slack
-    #     uses: actions/notify-slack@v3
-    #     with:
-    #       slack_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-    #       status: ${{ job.status }}
-    #       channel: '#your-slack-channel'
-    #       icon_url: 'https://github.com/favicon.ico'
-    #       message: |
-    #         Workflow: ${{ github.workflow }}
-    #         Branch: ${{ github.ref }}
-    #         Job: ${{ job.name }}
-    #         Status: ${{ job.status }}
-  
 
       - name: Send GitHub trigger payload to Slack Workflow Builder
         id: slack
         uses: slackapi/slack-github-action@v1.24.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
