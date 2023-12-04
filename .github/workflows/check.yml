@@ -14,8 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+    #   - name: Build
+    #     run: echo "hi"
+
       - name: Build
-        run: echo "hi"
+        run: sleep 40
 
   notify-start:
     needs: build
@@ -78,7 +81,7 @@ jobs:
               end_time=$(date -u -d "$end_time" '+%s')
               duration=$((end_time - start_time))
         
-              if [ $duration -gt 300 ]; then
+              if [ $duration -gt 30 ]; then
                 echo "::set-output name=send_notification::true"
               fi
             fi
