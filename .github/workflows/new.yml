@@ -1,0 +1,64 @@
+name: Build and Notify - POC Updated
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: sleep 120
+
+  notify-start:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification on pipeline start
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build has been triggered."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-duration:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check duration and send notification if more than 5 minutes
+        run: |
+          start_time=$(date -u '+%s')
+          end_time=$(date -u '+%s')
+          duration=$((end_time - start_time))
+
+          while [ $duration -le 35 ]; do
+            sleep 30  # Adjust the sleep interval as needed
+            end_time=$(date -u '+%s')
+            duration=$((end_time - start_time))
+          done
+
+          echo "::set-output name=send_notification::true"
+        id: check_duration
+
+      - name: Send notification on long-running pipeline
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "The build has been running for more than 5 minutes."
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        if: steps.check_duration.outputs.send_notification == 'true'
