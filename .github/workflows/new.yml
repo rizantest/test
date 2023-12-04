@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build
-        run: scho "build started"
+        run: echo "build started"
 
       - name: sleep
         run: sleep 120
