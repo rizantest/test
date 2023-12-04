@@ -34,7 +34,7 @@ jobs:
 
   notify-duration:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
     steps:
       - name: Check duration and send notification if more than 5 minutes
         run: |
